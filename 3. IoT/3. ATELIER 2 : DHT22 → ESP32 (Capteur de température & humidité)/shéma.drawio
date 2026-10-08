@@ -1,0 +1,43 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="9gg1kf1vLA5pOeyFRp5S">
+    <mxGraphModel dx="1414" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="520" width="640" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;" value="4. Application:&amp;nbsp;&lt;div&gt;Tableau de bord de la ville : état de chaque lampadaire, historique, alertes de panne, réglage des seuils à distance&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="560" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-7" edge="1" parent="1" source="RqUeEM8BGk8uw6pBwh1G-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="RqUeEM8BGk8uw6pBwh1G-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;" value="3. Traitement:&lt;div&gt;Règle : luminosité &amp;lt; seuil -&amp;gt; allumer, sinon éteindre (avec hystérésis). Local sur l&#39;ESP32.&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="560" x="40" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-6" edge="1" parent="1" source="RqUeEM8BGk8uw6pBwh1G-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="RqUeEM8BGk8uw6pBwh1G-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="2. Réseau :&lt;div&gt;LoRaWAN + MQTT vers une passerelle puis le serveur&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="560" x="40" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-5" edge="1" parent="1" source="RqUeEM8BGk8uw6pBwh1G-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="RqUeEM8BGk8uw6pBwh1G-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="1. Perception:&lt;div&gt;Capteur LDR -&amp;gt; entrée ESP32 : actionneur : lampadaire via GPIO.&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="560" x="40" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Valeur brute" vertex="1">
+          <mxGeometry height="30" width="140" x="290" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="mesures" vertex="1">
+          <mxGeometry height="30" width="140" x="290" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="RqUeEM8BGk8uw6pBwh1G-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="donnée / commande" vertex="1">
+          <mxGeometry height="30" width="140" x="315" y="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
