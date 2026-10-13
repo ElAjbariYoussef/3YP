@@ -1,25 +1,8 @@
 <?php
     $n = rand(-100,100);
-    if ( $n == 0 ){
-        $state = 0;
-        $pair = true;
-    }
-    else {
-        if ($n > 0){
-            $state = 1;
-        }
-        else {
-            $state = -1;
-        }
-        $temp_n = abs($n);
-        if ($temp_n % 2 == 0){
-            $pair = true;
-        }
-        else{
-            $pair = false;
-        }
-    }
-
+    $state = $n <=> 0;
+    $css = match($state) { 1 => "positif", 0 => "neutre", -1 => "negatif" };
+    $pair = $n % 2 == 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -32,7 +15,7 @@
 <main>
 <h1>Exercice 1 : Signe et parité</h1>
 
-<p class="card <?php echo match($state) { 1 => "positif", 0 => "neutre", -1 => "negatif" }?>"><?php echo $n, " est ", $p = $pair ? "pair" : "impair" ?></p>
+<p class="card <?=$css?>"><?= $n, " est ", $pair ? "pair" : "impair" ?></p>
 
 </main>
 </body>
