@@ -1,13 +1,8 @@
 <?php
     $note = rand(-5,25);
-    $isvalid = ($note>=0 and $note<=20) ? true : false;
+    $isvalid = ($note>=0 and $note<=20);
     if($isvalid){
-        if ($note > 10 ){
-            $mention = true; 
-        }
-        else{
-            $mention = false;
-        }
+        $mention = $note>10;
     }
 ?>
 <!DOCTYPE html>

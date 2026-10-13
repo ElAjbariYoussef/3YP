@@ -1,13 +1,8 @@
 <?php
     $jour = rand(-5,10);
-    $isvalid = ($jour>0 and $jour<8) ? true : false;
+    $isvalid = ($jour > 0 and $jour < 8);
     if($isvalid){
-        if ($jour > 5  ){
-            $end = true; 
-        }
-        else{
-            $end = false;
-        }
+        $end = $jour > 5;
         $nom = match($jour){
             1 => "Lundi",
             2 => "Mardi",
@@ -31,18 +26,18 @@
         <h1>Exercice 3 : Jour de la semaine</h1>
         <p class="carte <?php 
         if ($isvalid){
-        switch ($end) {
-            case true: 
-                echo "weekend \" > ";
-                break; 
-            case false : 
-                echo "ouvrable \" >";
-                break; 
-            };
-        echo $jour , " : ",$nom, ($end) ? "(week-end)" : " (jour ouvrable)";
+            switch ($end) {
+                case true: 
+                    echo "weekend \" > ";
+                    break; 
+                case false : 
+                    echo "ouvrable \" >";
+                    break; 
+                };
+            echo $jour , " : ",$nom, ($end) ? "(week-end)" : " (jour ouvrable)";
         }
         else { echo "neutre \" >" , $jour, " : jour invalide";}
-            ?></span>
+            ?></p>
     </main>
 </body>
 </html>
