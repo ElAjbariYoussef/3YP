@@ -23,3 +23,4 @@ font-size: 20px; line-height: 1.1; border-radius: 8px; }
 .liste li { border-radius: 6px; padding: 8px 12px; margin: 6px 0; background: #fff; }
 .barre { background: #e6e8ee; border-radius: 6px; height: 10px; }
 .barre div { background: #4f46a5; height: 10px; border-radius: 6px; }
+.fill { background: rgb(0, 255, 89);}

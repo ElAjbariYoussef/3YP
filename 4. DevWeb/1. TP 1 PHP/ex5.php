@@ -25,3 +25,31 @@ $n = rand(1,10);
         </main>
     </body>
 </html>
+
+
+
+                <tr>
+                    <th><?= $student["Python"]?></th>
+                </tr>
+                <tr>
+                    <th><?= $student["BD"]?></th>
+                </tr>
+                <tr>
+                    <th><?= $student["Web"]?></th>
+                </tr>
+
+                                <?php foreach($etudiants as $student) :?>
+
+                    <?php foreach($student as $note):?>
+                        <?php 
+                            $moyenne +=note;
+                        ?>
+                    <?php endforeach?>
+                    <?php foreach($coef as $element):?>
+                        <?php 
+                            $moyenne *= $element;
+                        ?>
+                    <?php endforeach?>
+                    <?= $moyenne/$somme_c; ?>
+                    <?php $moyenne = 0; ?>
+                <?php endforeach; ?>
