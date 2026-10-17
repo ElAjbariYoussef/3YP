@@ -1,4 +1,4 @@
-bool etatLed = HIGH;
+bool etatLed = LOW;
 bool dernierEtat = HIGH;
 
 void setup() {
@@ -7,10 +7,9 @@ void setup() {
 }
 void loop() {
     bool etatBouton = digitalRead(4);
-    if (dernierEtat == HIGH && etatBouton == HIGH) { 
+    if (dernierEtat == HIGH && etatBouton == LOW) { 
         etatLed = !etatLed;
         digitalWrite(2, etatLed);
-        delay(50);
     }
     dernierEtat = !dernierEtat;
 }
