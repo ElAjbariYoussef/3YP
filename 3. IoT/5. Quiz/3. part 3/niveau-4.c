@@ -6,8 +6,10 @@ void setup() {
 }
 void loop() {
     int valeur = analogRead(PHOTO);
-    int brightness = map(valeur,0,4095,255,0);
-    if (brightness > 100) brightness = 255; // seuil
+    int brightness = map(valeur, 0, 4095, 255, 0);
+    if (brightness > 100)
+        brightness = 255;
+    else
+        brightness = 0;
     analogWrite(LED, brightness);
-    delay(10);
 }
