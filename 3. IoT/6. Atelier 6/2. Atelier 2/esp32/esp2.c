@@ -47,7 +47,7 @@ while (!client.connected()) {
 
 Serial.println("Connexion MQTT...");
 
-if (client.connect("ESP32_01")) {
+if (client.connect("ESP32_02")) {
 
 Serial.println("MQTT connecte !");
 
@@ -98,7 +98,7 @@ return;
 
 if (temperature > 30.0) {
 JsonDocument alertDoc;
-alertDoc["device_id"] = "ESP32_01";
+alertDoc["device_id"] = "ESP32_02";
 alertDoc["alert"] = "HIGH_TEMPERATURE";
 alertDoc["temperature"] = temperature;
 
