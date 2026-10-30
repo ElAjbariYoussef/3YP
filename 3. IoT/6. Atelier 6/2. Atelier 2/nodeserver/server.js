@@ -17,6 +17,7 @@ const topicMesure = "smartroom/measurements";
 const topicTemperature = "smartroom/temperature";
 const topicHumidity = "smartroom/humidity";
 const topicStatus = "smartroom/status";
+const topicAlert = "smartroom/alert";
 
 
 let lastMeasurement = null;
@@ -29,7 +30,8 @@ mqttClient.on("connect", () => {
         topicMesure,
         topicTemperature,
         topicHumidity,
-        topicStatus
+        topicStatus,
+        topicAlert
     ];
 
     mqttClient.subscribe(topics, (err) => {
@@ -101,6 +103,28 @@ mqttClient.on("message", (receivedTopic, message) => {
 
                 console.log("Statut :", data);
                 io.emit("deviceStatus", data);
+
+                break;
+
+            case topicAlert:
+
+                if (
+                    typeof data.device_id !== "string" ||
+                    data.alert !== "HIGH_TEMPERATURE" ||
+                    typeof data.temperature !== "number" ||
+                    data.temperature <= 30
+                ) {
+                    console.log("Alerte invalide :", data);
+                    return;
+                }
+
+                const alert = {
+                    ...data,
+                    receivedAt: new Date().toISOString()
+                };
+
+                console.log("ALERTE TEMPERATURE ELEVEE :", alert);
+                io.emit("temperatureAlert", alert);
 
                 break;
 

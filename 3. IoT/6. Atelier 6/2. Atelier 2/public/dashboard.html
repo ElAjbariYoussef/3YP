@@ -2,512 +2,107 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Room Monitoring</title>
+<title>Smart Room IoT</title>
 
 <script src="/socket.io/socket.io.js"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(160deg, #eef2f7 0%, #e2e8f0 100%);
-  color: #1e293b;
-  min-height: 100vh;
-  padding: 30px 20px 50px;
+font-family: Arial;
+background: #eef2f7;
+text-align: center;
+padding: 30px;
 }
-
-header {
-  max-width: 1100px;
-  margin: 0 auto 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-h1 {
-  margin: 0;
-  font-size: 28px;
-}
-
-.subtitle {
-  margin: 6px 0 0;
-  color: #64748b;
-}
-
-.connection {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  background: white;
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-weight: bold;
-  font-size: 14px;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.08);
-}
-
-.connection .dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: #94a3b8;
-}
-
-.connection.online .dot {
-  background: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
-}
-
-.connection.offline .dot {
-  background: #ef4444;
-  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
-}
-
-main {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.room-info {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px;
-  margin-bottom: 22px;
-}
-
-.info-item {
-  background: white;
-  border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.07);
-}
-
-.info-item .label {
-  display: block;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #64748b;
-  margin-bottom: 6px;
-}
-
-.info-item .info-value {
-  font-size: 17px;
-  font-weight: bold;
-}
-
-.alerts {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-
-.alert {
-  background: #fee2e2;
-  border-left: 6px solid #ef4444;
-  color: #991b1b;
-  padding: 14px 18px;
-  border-radius: 10px;
-  font-weight: bold;
-  text-align: left;
-}
-
-.alert.ok {
-  background: #dcfce7;
-  border-left-color: #22c55e;
-  color: #166534;
-}
-
 .dashboard {
-  display: flex;
-  justify-content: center;
-  gap: 22px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
+display: flex;
+justify-content: center;
+gap: 25px;
+flex-wrap: wrap;
 }
-
 .card {
-  background: white;
-  padding: 26px;
-  border-radius: 16px;
-  flex: 1 1 280px;
-  max-width: 420px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-  border: 2px solid transparent;
-  transition: border-color 0.2s, background 0.2s;
+background: white;
+padding: 30px;
+border-radius: 15px;
+width: 220px;
+box-shadow: 0 3px 10px #bbb;
 }
-
-.card.alert {
-  border-color: #ef4444;
-  background: #fff5f5;
-}
-
-.card h2 {
-  margin: 0 0 14px;
-  font-size: 18px;
-  color: #475569;
-}
-
-.metric-value {
-  font-size: 52px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.metric-value .unit {
-  font-size: 24px;
-  font-weight: normal;
-  color: #64748b;
-  margin-left: 6px;
-}
-
-.threshold {
-  margin: 12px 0 0;
-  font-size: 13px;
-  color: #94a3b8;
-}
-
-.history {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
-}
-
-.history h2 {
-  margin: 0 0 16px;
-  font-size: 19px;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-thead th {
-  text-align: left;
-  padding: 10px 12px;
-  background: #f1f5f9;
-  color: #475569;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-tbody td {
-  padding: 11px 12px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
-tbody tr:nth-child(even) {
-  background: #f8fafc;
-}
-
-td.hot {
-  color: #dc2626;
-  font-weight: bold;
-}
-
-td.empty {
-  text-align: center;
-  color: #94a3b8;
-  padding: 24px;
-}
-
-@media (max-width: 600px) {
-  h1 {
-    font-size: 22px;
-  }
-
-  .metric-value {
-    font-size: 42px;
-  }
+.value {
+font-size: 40px;
+font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div>
-    <h1>Smart Room Monitoring</h1>
-    <p class="subtitle">Température et humidité en temps réel</p>
-  </div>
+<h1>Smart Room IoT Dashboard</h1>
 
-  <div class="connection" id="connection">
-    <span class="dot"></span>
-    <span id="status">Connexion...</span>
-  </div>
-</header>
+<p id="status">Connexion...</p>
 
-<main>
+<div class="dashboard">
 
-  <section class="room-info">
-    <div class="info-item">
-      <span class="label">Salle</span>
-      <span class="info-value" id="room">--</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Équipement</span>
-      <span class="info-value" id="device">--</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Capteur</span>
-      <span class="info-value" id="sensor">--</span>
-    </div>
-    <div class="info-item">
-      <span class="label">État capteur</span>
-      <span class="info-value" id="sensor-status">--</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Compteur ESP32</span>
-      <span class="info-value" id="counter">--</span>
-    </div>
-    <div class="info-item">
-      <span class="label">Dernière réception</span>
-      <span class="info-value" id="time">--</span>
-    </div>
-  </section>
+<div class="card">
+<h2>Temperature</h2>
+<div class="value" id="temperature">--</div>
+°C
+</div>
 
-  <section class="alerts" id="alerts" aria-live="polite"></section>
+<div class="card">
+<h2>Humidite</h2>
+<div class="value" id="humidity">--</div>
+%
+</div>
 
-  <section class="dashboard">
-    <div class="card" id="temperature-card">
-      <h2>Température</h2>
-      <div class="metric-value">
-        <span id="temperature">--</span><span class="unit">°C</span>
-      </div>
-      <p class="threshold">Seuil d'alerte : 30 °C</p>
-    </div>
+</div>
 
-    <div class="card" id="humidity-card">
-      <h2>Humidité</h2>
-      <div class="metric-value">
-        <span id="humidity">--</span><span class="unit">%</span>
-      </div>
-      <p class="threshold">Seuil d'alerte : 70 %</p>
-    </div>
-  </section>
-
-  <section class="history">
-    <h2>Historique — 10 dernières mesures</h2>
-
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Heure</th>
-            <th>Température</th>
-            <th>Humidité</th>
-            <th>Salle</th>
-            <th>Appareil</th>
-          </tr>
-        </thead>
-        <tbody id="history-body">
-          <tr>
-            <td colspan="5" class="empty">Aucune mesure reçue pour le moment.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-</main>
+<p>Equipement : <span id="device">--</span></p>
+<p>Derniere reception : <span id="time">--</span></p>
+<p id="alert" hidden></p>
 
 <script>
-const MAX_HISTORY = 10;
-const TEMPERATURE_THRESHOLD = 30;
-const HUMIDITY_THRESHOLD = 70;
 
 const socket = io();
 
-let measurements = [];
+socket.on("connect", () => {
+document.getElementById("status").textContent =
+"Serveur connecte";
+});
 
-function setConnection(connected) {
-  const connection = document.getElementById("connection");
-
-  connection.classList.toggle("online", connected);
-  connection.classList.toggle("offline", !connected);
-
-  document.getElementById("status").textContent = connected
-    ? "Serveur connecté"
-    : "Serveur déconnecté";
-}
-
-socket.on("connect", () => setConnection(true));
-socket.on("disconnect", () => setConnection(false));
-
-function formatTime(isoDate) {
-  if (!isoDate) return "--";
-
-  return new Date(isoDate).toLocaleTimeString("fr-FR", { hour12: false });
-}
-
-function formatDateTime(isoDate) {
-  if (!isoDate) return "--";
-
-  return new Date(isoDate).toLocaleString("fr-FR", { hour12: false });
-}
-
-function escapeHtml(value) {
-  return String(value ?? "--").replace(/[&<>"']/g, (character) => {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    }[character];
-  });
-}
-
-function applyAlerts(temperature, humidity) {
-  const temperatureAlert = temperature > TEMPERATURE_THRESHOLD;
-  const humidityAlert = humidity > HUMIDITY_THRESHOLD;
-
-  document
-    .getElementById("temperature-card")
-    .classList.toggle("alert", temperatureAlert);
-
-  document
-    .getElementById("humidity-card")
-    .classList.toggle("alert", humidityAlert);
-
-  const alerts = [];
-
-  if (temperatureAlert) {
-    alerts.push(
-      `Température trop élevée : ${temperature.toFixed(1)} °C ` +
-      `(seuil : ${TEMPERATURE_THRESHOLD} °C)`
-    );
-  }
-
-  if (humidityAlert) {
-    alerts.push(
-      `Humidité trop élevée : ${humidity.toFixed(1)} % ` +
-      `(seuil : ${HUMIDITY_THRESHOLD} %)`
-    );
-  }
-
-  const container = document.getElementById("alerts");
-
-  if (alerts.length === 0) {
-    container.innerHTML =
-      '<div class="alert ok">Aucune alerte : les valeurs sont dans les seuils.</div>';
-    return;
-  }
-
-  container.innerHTML = alerts
-    .map((message) => `<div class="alert">⚠ ${message}</div>`)
-    .join("");
-}
+socket.on("disconnect", () => {
+document.getElementById("status").textContent =
+"Serveur deconnecte";
+});
 
 function displayMeasurement(data) {
-  const temperature = Number(data.temperature);
-  const humidity = Number(data.humidity);
 
-  document.getElementById("temperature").textContent = temperature.toFixed(1);
-  document.getElementById("humidity").textContent = humidity.toFixed(1);
+document.getElementById("temperature").textContent =
+Number(data.temperature).toFixed(1);
 
-  document.getElementById("room").textContent = data.location || "--";
-  document.getElementById("device").textContent = data.device_id || "--";
-  document.getElementById("sensor").textContent = data.sensor_type || "--";
-  document.getElementById("sensor-status").textContent = data.status || "--";
-  document.getElementById("counter").textContent =
-    data.counter !== undefined && data.counter !== null ? data.counter : "--";
-  document.getElementById("time").textContent = formatDateTime(data.receivedAt);
+document.getElementById("humidity").textContent =
+Number(data.humidity).toFixed(1);
 
-  applyAlerts(temperature, humidity);
+document.getElementById("device").textContent =
+data.device_id;
+
+document.getElementById("time").textContent =
+new Date(data.receivedAt).toLocaleTimeString();
 }
 
-function addMeasurement(data) {
-  measurements.unshift(data);
-
-  if (measurements.length > MAX_HISTORY) {
-    measurements.pop();
-  }
-
-  renderHistory();
-}
-
-function renderHistory() {
-  const body = document.getElementById("history-body");
-
-  if (measurements.length === 0) {
-    body.innerHTML =
-      '<tr><td colspan="5" class="empty">Aucune mesure reçue pour le moment.</td></tr>';
-    return;
-  }
-
-  body.innerHTML = measurements
-    .map((measurement) => {
-      const temperature = Number(measurement.temperature);
-      const humidity = Number(measurement.humidity);
-
-      const temperatureClass =
-        temperature > TEMPERATURE_THRESHOLD ? "hot" : "";
-      const humidityClass = humidity > HUMIDITY_THRESHOLD ? "hot" : "";
-
-      return `
-        <tr>
-          <td>${escapeHtml(formatTime(measurement.receivedAt))}</td>
-          <td class="${temperatureClass}">${temperature.toFixed(1)} °C</td>
-          <td class="${humidityClass}">${humidity.toFixed(1)} %</td>
-          <td>${escapeHtml(measurement.location || "--")}</td>
-          <td>${escapeHtml(measurement.device_id || "--")}</td>
-        </tr>
-      `;
-    })
-    .join("");
-}
-
-socket.on("newMeasurement", (data) => {
-  displayMeasurement(data);
-  addMeasurement(data);
+fetch("/api/measurements/latest")
+.then(response => response.json())
+.then(data => {
+if (data) displayMeasurement(data);
 });
 
-socket.on("history", (data) => {
-  measurements = Array.isArray(data) ? data.slice(0, MAX_HISTORY) : [];
-  renderHistory();
+socket.on("newMeasurement", displayMeasurement);
 
-  if (measurements.length > 0) {
-    displayMeasurement(measurements[0]);
-  }
+socket.on("temperatureAlert", data => {
+const alert = document.getElementById("alert");
+alert.hidden = false;
+alert.textContent =
+`ALERTE : temperature elevee (${Number(data.temperature).toFixed(1)} °C)`;
 });
 
-Promise.all([
-  fetch("/api/measurements/latest")
-    .then((response) => (response.ok ? response.json() : null))
-    .catch(() => null),
-  fetch("/api/measurements/history")
-    .then((response) => (response.ok ? response.json() : []))
-    .catch(() => [])
-]).then(([latest, history]) => {
-  if (Array.isArray(history) && history.length > 0 && measurements.length === 0) {
-    measurements = history.slice(0, MAX_HISTORY);
-    renderHistory();
-    displayMeasurement(measurements[0]);
-  } else if (latest && measurements.length === 0) {
-    displayMeasurement(latest);
-  }
-});
 </script>
 
 </body>
