@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Smart Room IoT</title>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<style>
+body {
+font-family: Arial;
+background: #eef2f7;
+text-align: center;
+padding: 30px;
+}
+.dashboard {
+display: flex;
+justify-content: center;
+gap: 25px;
+flex-wrap: wrap;
+}
+.card {
+background: white;
+padding: 30px;
+border-radius: 15px;
+width: 220px;
+box-shadow: 0 3px 10px #bbb;
+}
+.value {
+font-size: 40px;
+font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Smart Room IoT Dashboard</h1>
+
+<p id="status">Connexion...</p>
+
+<div class="dashboard">
+
+<div class="card">
+<h2>Temperature</h2>
+<div class="value" id="temperature">--</div>
+°C
+</div>
+
+<div class="card">
+<h2>Humidite</h2>
+<div class="value" id="humidity">--</div>
+%
+</div>
+
+</div>
+
+<p>Equipement : <span id="device">--</span></p>
+<p>Derniere reception : <span id="time">--</span></p>
+<p id="alert" hidden></p>
+
+<script>
+
+const socket = io();
+
+socket.on("connect", () => {
+document.getElementById("status").textContent =
+"Serveur connecte";
+});
+
+function setConnection(connected) {
+  const connection = document.getElementById("connection");
+
+  connection.classList.toggle("online", connected);
+  connection.classList.toggle("offline", !connected);
+
+  document.getElementById("status").textContent = connected
+    ? "Serveur connecté"
+    : "Serveur déconnecté";
+}
+
+socket.on("connect", () => setConnection(true));
+socket.on("disconnect", () => setConnection(false));
+
+function formatTime(isoDate) {
+  if (!isoDate) return "--";
+
+  return new Date(isoDate).toLocaleTimeString("fr-FR", { hour12: false });
+}
+
+function formatDateTime(isoDate) {
+  if (!isoDate) return "--";
+
+  return new Date(isoDate).toLocaleString("fr-FR", { hour12: false });
+}
+
+function escapeHtml(value) {
+  return String(value ?? "--").replace(/[&<>"']/g, (character) => {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[character];
+  });
+}
+
+function applyAlerts(temperature, humidity) {
+  const temperatureAlert = temperature > TEMPERATURE_THRESHOLD;
+  const humidityAlert = humidity > HUMIDITY_THRESHOLD;
+
+  document
+    .getElementById("temperature-card")
+    .classList.toggle("alert", temperatureAlert);
+
+  document
+    .getElementById("humidity-card")
+    .classList.toggle("alert", humidityAlert);
+
+  const alerts = [];
+
+  if (temperatureAlert) {
+    alerts.push(
+      `Température trop élevée : ${temperature.toFixed(1)} °C ` +
+      `(seuil : ${TEMPERATURE_THRESHOLD} °C)`
+    );
+  }
+
+  if (humidityAlert) {
+    alerts.push(
+      `Humidité trop élevée : ${humidity.toFixed(1)} % ` +
+      `(seuil : ${HUMIDITY_THRESHOLD} %)`
+    );
+  }
+
+  const container = document.getElementById("alerts");
+
+  if (alerts.length === 0) {
+    container.innerHTML =
+      '<div class="alert ok">Aucune alerte : les valeurs sont dans les seuils.</div>';n
+    retur;
+  }
+
+  container.innerHTML = alerts
+    .map((message) => `<div class="alert">⚠ ${message}</div>`)
+    .join("");
+}
+socket.on("disconnect", () => {
+document.getElementById("status").textContent =
+"Serveur deconnecte";
+});
+
+function displayMeasurement(data) {
+
+document.getElementById("temperature").textContent =
+Number(data.temperature).toFixed(1);
+
+document.getElementById("humidity").textContent =
+Number(data.humidity).toFixed(1);
+
+document.getElementById("device").textContent =
+data.device_id;
+
+document.getElementById("time").textContent =
+new Date(data.receivedAt).toLocaleTimeString();
+}
+
+fetch("/api/measurements/latest")
+.then(response => response.json())
+.then(data => {
+if (data) displayMeasurement(data);
+});
+
+socket.on("newMeasurement", displayMeasurement);
+
+socket.on("temperatureAlert", data => {
+const alert = document.getElementById("alert");
+alert.hidden = false;
+alert.textContent =
+`ALERTE : temperature elevee (${Number(data.temperature).toFixed(1)} °C)`;
+});
+
+</script>
+
+</body>
+</html>

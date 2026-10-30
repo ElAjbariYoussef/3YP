@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Alarm</title>
+
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #111827;
+            color: #f9fafb;
+        }
+
+        h1 { text-align: center; }
+
+        .connection, .status {
+            background: #1f2937;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 10px;
+        }
+
+        input, button {
+            box-sizing: border-box;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #4b5563;
+            font: inherit;
+        }
+
+        input {
+            width: 100%;
+            margin: 8px 0;
+            background: #111827;
+            color: white;
+        }
+
+        button {
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            border: none;
+        }
+
+        .connection button { width: 100%; }
+
+        .status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .value { font-weight: bold; }
+        .on { color: #4ade80; }
+        .off { color: #f87171; }
+        #connectionStatus { color: #fbbf24; }
+        #toggleButton { width: 100%; margin-top: 12px; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+
+<body>
+    <h1>ESP32 Alarm</h1>
+
+    <div class="connection">
+        <label for="ip">ESP32 IP address</label>
+        <input id="ip" placeholder="192.168.1.42" value="">
+        <button id="connectButton">Connect</button>
+        <p>Connection: <span id="connectionStatus">Disconnected</span></p>
+    </div>
+
+    <div class="status">
+        <span>Alarm armed</span>
+        <span id="arme" class="value">Unknown</span>
+    </div>
+
+    <div class="status">
+        <span>Red LED</span>
+        <span id="red" class="value">Unknown</span>
+    </div>
+
+    <div class="status">
+        <span>Green LED</span>
+        <span id="green" class="value">Unknown</span>
+    </div>
+
+    <button id="toggleButton" disabled>Connect first</button>
+
+    <script>
+        let socket = null;
+        let armed = false;
+        let lastStatus = null;
+        const $ = id => document.getElementById(id);
+        function showValue(id, value) {
+            const element = $(id);
+            element.textContent = value ? "ON" : "OFF";
+            element.className = "value " + (value ? "on" : "off");
+        }
+        function connect() {
+            if (socket) {
+                socket.close();
+            }
+            const ip = $("ip").value.trim()
+                .replace(/^ws:\/\//, "")
+                .replace(/\/$/, "");
+            if (!ip || /[/:?#\s]/.test(ip)) {
+                alert("Enter a valid ESP32 IP address.");
+                return;
+            }
+            $("connectionStatus").textContent = "Connecting...";
+            $("toggleButton").disabled = true;
+            socket = new WebSocket(`ws://${ip}:81`);
+            socket.onopen = () => {
+                $("connectionStatus").textContent = "Connected";
+                $("connectionStatus").style.color = "#4ade80";
+                $("toggleButton").disabled = false;
+                $("toggleButton").textContent = "Loading status...";
+            };
+            socket.onmessage = event => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (typeof data.arme !== "boolean" ||
+                        typeof data.red !== "boolean" ||
+                        typeof data.green !== "boolean") {
+                        return;
+                    }
+                    lastStatus = data;
+                    armed = data.arme;
+                    showValue("arme", data.arme);
+                    showValue("red", data.red);
+                    showValue("green", data.green);
+                    $("toggleButton").textContent =
+                        armed ? "Disarm alarm" : "Arm alarm";
+                } catch (error) {
+                    console.warn("Unexpected WebSocket message:", event.data);
+                }
+            };
+            socket.onclose = () => {
+                $("connectionStatus").textContent = "Disconnected";
+                $("connectionStatus").style.color = "#f87171";
+                $("toggleButton").disabled = true;
+            };
+            socket.onerror = () => {
+                $("connectionStatus").textContent = "Connection error";
+            };
+        }
+        $("connectButton").addEventListener("click", connect);
+        $("toggleButton").addEventListener("click", () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN ||
+                !lastStatus) {
+                return;
+            }
+            socket.send(JSON.stringify({
+                command: "setArmed",
+                value: !armed
+            }));
+            $("toggleButton").disabled = true;
+            $("toggleButton").textContent = "Updating...";
+            setTimeout(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    $("toggleButton").disabled = false;
+                    $("toggleButton").textContent =
+                        armed ? "Disarm alarm" : "Arm alarm";
+                }
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

@@ -5,9 +5,9 @@ void setup(){
     pinMode(2, OUTPUT);
 }
 void loop() {
-    if (digitalRead(BOUTON) == LOW) {
-    digitalWrite(LED, HIGH);
+    if (digitalRead(4) == LOW) {
+    digitalWrite(2, HIGH);
     } else {
-    digitalWrite(LED, LOW);
+    digitalWrite(2, LOW);
     }
 }
