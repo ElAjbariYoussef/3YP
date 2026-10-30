@@ -133,15 +133,15 @@ topicMesure,
 message.c_str()
 );
 
-bool published1 = client.publish(
+client.publish(
 topicTemperature,
 message.c_str()
 );
-bool published2 = client.publish(
+client.publish(
 topicHumidity,
 message.c_str()
 );
-bool published3 = client.publish(
+client.publish(
 topicStatus,
 message.c_str()
 );
