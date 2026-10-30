@@ -3,18 +3,22 @@
 #include <DHT.h>
 #include <ArduinoJson.h>
 
-#define DHTPIN 18
+#define DHTPIN 17
 #define DHTTYPE DHT22
 
 DHT dht(DHTPIN, DHTTYPE);
 
-const char* ssid = "wifi";
-const char* password = "pswd";
+const char* ssid = "NOM_WIFI";
+const char* password = "MOT_DE_PASSE";
 
-const char* mqtt_server = "192.168.137.62";
+const char* mqtt_server = "192.168.1.10";
 const int mqtt_port = 1883;
 
-const char* topic = "smartroom/measurements";
+const char* topicMesure = "smartroom/measurements";
+const char* topicTemperature = "smartroom/temperature";
+const char* topicHumidity = "smartroom/humidity";
+const char* topicStatus = "smartroom/status";
+const char* topicAlert = "smartroom/alert";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -43,7 +47,7 @@ while (!client.connected()) {
 
 Serial.println("Connexion MQTT...");
 
-if (client.connect("ESP32_02")) {
+if (client.connect("ESP32_01")) {
 
 Serial.println("MQTT connecte !");
 
@@ -92,12 +96,30 @@ Serial.println("Erreur DHT22");
 return;
 }
 
+if (temperature > 30.0) {
+JsonDocument alertDoc;
+alertDoc["device_id"] = "ESP32_01";
+alertDoc["alert"] = "HIGH_TEMPERATURE";
+alertDoc["temperature"] = temperature;
+
+String alertMessage;
+serializeJson(alertDoc, alertMessage);
+
+bool alertPublished = client.publish(topicAlert, alertMessage.c_str());
+
+Serial.println(alertMessage);
+Serial.println(
+alertPublished ? "Alerte publiee" :
+"Echec publication alerte"
+);
+}
+
 JsonDocument doc;
 
 doc["device_id"] = "ESP32_02";
 doc["temperature"] = temperature;
 doc["humidity"] = humidity;
-doc["location"] =  "Salle TP";
+doc["location"] =  "Salle TP2";
 doc["sensor_type"] =  "DHT22";
 doc["counter"] =  "1";
 doc["status"] =  "OK";
@@ -107,7 +129,20 @@ String message;
 serializeJson(doc, message);
 
 bool published = client.publish(
-topic,
+topicMesure,
+message.c_str()
+);
+
+bool published1 = client.publish(
+topicTemperature,
+message.c_str()
+);
+bool published2 = client.publish(
+topicHumidity,
+message.c_str()
+);
+bool published3 = client.publish(
+topicStatus,
 message.c_str()
 );
 
