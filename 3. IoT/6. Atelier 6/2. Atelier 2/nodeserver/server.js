@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static("public"));
+app.use(express.static("public", { index: "dashboard.html" }));
 
 const mqttClient = mqtt.connect(
 "mqtt://127.0.0.1:1883"

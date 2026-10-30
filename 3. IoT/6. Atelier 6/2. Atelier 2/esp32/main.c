@@ -3,15 +3,15 @@
 #include <DHT.h>
 #include <ArduinoJson.h>
 
-#define DHTPIN 15
+#define DHTPIN 17
 #define DHTTYPE DHT22
 
 DHT dht(DHTPIN, DHTTYPE);
 
-const char* ssid = "NOM_WIFI";
-const char* password = "MOT_DE_PASSE";
+const char* ssid = "Wifi";
+const char* password = "pswd";
 
-const char* mqtt_server = "192.168.1.10";
+const char* mqtt_server = "192.168.137.62";
 const int mqtt_port = 1883;
 
 const char* topic = "smartroom/measurements";
