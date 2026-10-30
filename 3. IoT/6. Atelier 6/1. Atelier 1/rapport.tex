@@ -207,8 +207,8 @@
     {Acquisition DHT22, transmission ESP32,\\serveur Node.js et tableau de bord web};
   \draw[teal,line width=1.2pt] ([xshift=2.2cm,yshift=-10.15cm]current page.north west) -- ++(5.3cm,0);
 
-  \node[anchor=west,text=black!68,font=\normalsize,text width=13.8cm,align=left]
-    at ([xshift=2.2cm,yshift=-10.85cm]current page.north west)
+  \node[anchor=north west,text=black!68,font=\normalsize,text width=13.8cm,align=left]
+    at ([xshift=2.2cm,yshift=-10.45cm]current page.north west)
     {Ce rapport présente la conception, la réalisation et la validation d'une chaîne
      d'Internet des objets permettant de mesurer la température et l'humidité d'une salle,
      de transmettre les données à un serveur et de les visualiser en temps réel dans un
@@ -248,8 +248,8 @@
 % SOMMAIRE
 % ===========================================================================
 \pagenumbering{roman}
-\setcounter{page}{2}
 \setcounter{tocdepth}{1}
+\renewcommand{\contentsname}{Sommaire}
 \tableofcontents
 \clearpage
 
@@ -325,23 +325,21 @@ L'architecture suit un modèle en trois couches, représenté sur la figure~\ref
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-  node distance=1.0cm and 1.05cm,
+  node distance=1.0cm and 1.55cm,
   box/.style={draw=coverblue!55,fill=coverblue!5,rounded corners=4pt,
-              minimum width=3.5cm,minimum height=1.55cm,align=center,
+              text width=3.1cm,minimum height=1.8cm,align=center,
               font=\sffamily\small,inner sep=4pt},
   arr/.style={-{Latex[length=2.6mm]},line width=0.9pt,draw=teal},
   lab/.style={font=\scriptsize,fill=white,inner sep=1pt,text=black!70}
 ]
-  \node[box] (sensor) {\faThermometerHalf\\[2pt]\textbf{DHT22}\\Température et humidité};
-  \node[box,right=of sensor] (esp) {\faMicrochip\\[2pt]\textbf{ESP32}\\Acquisition et Wi-Fi};
-  \node[box,right=of esp] (server) {\faServer\\[2pt]\textbf{Serveur Node.js}\\Express et Socket.IO};
-  \node[box,below=1.35cm of server] (browser) {\faDesktop\\[2pt]\textbf{Dashboard web}\\HTML, CSS et JavaScript};
+  \node[box] (sensor) {\faThermometerHalf\\[2pt]\textbf{DHT22}\\[1pt]{\footnotesize Température\\et humidité}};
+  \node[box,right=of sensor] (esp) {\faMicrochip\\[2pt]\textbf{ESP32}\\[1pt]{\footnotesize Acquisition\\et Wi-Fi}};
+  \node[box,right=of esp] (server) {\faServer\\[2pt]\textbf{Serveur Node.js}\\[1pt]{\footnotesize Express\\et Socket.IO}};
+  \node[box,below=1.35cm of server] (browser) {\faDesktop\\[2pt]\textbf{Dashboard web}\\[1pt]{\footnotesize HTML, CSS\\et JavaScript}};
 
-  \draw[arr] (sensor) -- node[above,lab]{GPIO 17} node[below,lab]{DHT22} (esp);
+  \draw[arr] (sensor) -- node[above,lab]{GPIO 17} node[below,lab]{données} (esp);
   \draw[arr] (esp) -- node[above,lab]{HTTP POST} node[below,lab]{JSON / 5 s} (server);
   \draw[arr] (server) -- node[right,lab]{WebSocket} (browser);
-  \node[draw=teal,dashed,rounded corners=3pt,fit=(sensor)(esp),inner sep=8pt,
-        label={[font=\scriptsize,text=teal]below:Réseau local Wi-Fi}] {};
 \end{tikzpicture}
 \caption{Architecture en trois couches de la chaîne Smart Room Monitoring.}
 \label{fig:architecture}
@@ -791,7 +789,7 @@ montre l'interface en fonctionnement. Elle est organisée en quatre zones :
   \item deux cartes de mesure (température et humidité) et un tableau d'historique.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=0.98\textwidth]{dashboard.png}
 \caption{Tableau de bord en fonctionnement : température 25,0~\textdegree C, humidité 63,3~\%, serveur connecté.}
@@ -1016,7 +1014,7 @@ programmé dans le firmware.
 \begin{tikzpicture}
 \begin{axis}[
   width=0.86\textwidth,
-  height=6.2cm,
+  height=5.6cm,
   xlabel={Temps écoulé depuis la première mesure (s)},
   ylabel={Humidité relative (\%)},
   xmin=-1, xmax=22,
@@ -1051,8 +1049,8 @@ acquisition toutes les cinq secondes.
 \subsection{Tests de validation}
 
 Des requêtes invalides ont été envoyées avec \texttt{curl} pour vérifier le comportement du
-serveur. Le tableau~\ref{tab:tests} résume les cas testés et la figure~\ref{lst:api-errors}
-donne les réponses obtenues.
+serveur. Le tableau~\ref{tab:tests} résume les cas testés et le code~\ref{lst:api-errors}
+donne le corps des réponses obtenues ; toutes portent le code HTTP 400.
 
 \begin{table}[H]
 \centering
@@ -1070,23 +1068,19 @@ Humidité hors plage & \texttt{"humidity":120} & 400 \\
 \label{tab:tests}
 \end{table}
 
-\begin{lstlisting}[language=JavaScript,caption={Réponses du serveur aux requêtes invalides.},label={lst:api-errors}]
-HTTP 400
+\begin{lstlisting}[language=JavaScript,caption={Corps des réponses HTTP 400 renvoyées par le serveur.},label={lst:api-errors},aboveskip=4pt,belowskip=4pt]
 {"success":false,"message":"Donnees invalides",
  "errors":["device_id est obligatoire et doit etre une chaine de caracteres"]}
-
-HTTP 400
 {"success":false,"message":"Donnees invalides",
  "errors":["temperature doit etre un nombre"]}
-
-HTTP 400
 {"success":false,"message":"Donnees invalides",
  "errors":["humidity doit etre comprise entre 0 et 100 %"]}
 \end{lstlisting}
 
+\enlargethispage{3\baselineskip}
 Les trois requêtes sont rejetées avec un code 400 et un message explicite. Aucune mesure
-invalide n'est ajoutée à l'historique, car le contrôle est effectué avant la construction de
-l'objet \texttt{measurement}. Ce comportement est conforme au cahier des charges.
+invalide n'est ajoutée à l'historique, car le contrôle précède la construction de l'objet
+\texttt{measurement}.
 
 
 \end{document}
