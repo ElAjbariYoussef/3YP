@@ -47,42 +47,72 @@ mqttClient.on("connect", () => {
 
 mqttClient.on("message", (receivedTopic, message) => {
 
-try {
+    try {
 
-const data = JSON.parse(message.toString());
+        const data = JSON.parse(message.toString());
 
-if (
-typeof data.temperature !== "number" ||
-typeof data.humidity !== "number" ||
-typeof data.device_id !== "string" ||
-data.temperature < -40 ||
-data.temperature > 80 ||
-data.humidity < 0 ||
-data.humidity > 100
-) {
-console.log("Mesure invalide");
-return;
-}
+        switch (receivedTopic) {
 
-const measurement = {
-...data,
-receivedAt: new Date().toISOString()
-};
+            case topicMesure:
 
-lastMeasurement = measurement;
+                // Complete measurement
+                console.log("Mesure complete :", data);
 
-console.log("Message recu :", measurement);
+                // Your existing validation
+                if (
+                    typeof data.temperature !== "number" ||
+                    typeof data.humidity !== "number" ||
+                    typeof data.device_id !== "string" ||
+                    data.temperature < -40 ||
+                    data.temperature > 80 ||
+                    data.humidity < 0 ||
+                    data.humidity > 100
+                ) {
+                    console.log("Mesure invalide");
+                    return;
+                }
 
-io.emit("newMeasurement", measurement);
+                const measurement = {
+                    ...data,
+                    receivedAt: new Date().toISOString()
+                };
 
-} catch (error) {
+                lastMeasurement = measurement;
 
-console.log("Erreur JSON :", error.message);
+                io.emit("newMeasurement", measurement);
 
-}
+                break;
+
+            case topicTemperature:
+
+                console.log("Temperature :", data);
+                io.emit("newTemperature", data);
+
+                break;
+
+            case topicHumidity:
+
+                console.log("Humidite :", data);
+                io.emit("newHumidity", data);
+
+                break;
+
+            case topicStatus:
+
+                console.log("Statut :", data);
+                io.emit("deviceStatus", data);
+
+                break;
+
+        }
+
+    } catch (error) {
+
+        console.log("Erreur JSON :", error.message);
+
+    }
 
 });
-
 app.get("/api/measurements/latest", (req, res) => {
 res.json(lastMeasurement);
 });
